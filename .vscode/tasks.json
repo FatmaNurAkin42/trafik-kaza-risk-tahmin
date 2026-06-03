@@ -1,0 +1,12 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run trafik_kaza_riski_tahmini.py",
+			"type": "shell",
+			"command": "python trafik_kaza_riski_tahmini.py",
+			"problemMatcher": [],
+			"group": "build"
+		}
+	]
+}
