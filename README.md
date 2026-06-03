@@ -28,8 +28,8 @@ Bu proje, ABD trafik kazası verileri üzerinden kaza riskini analiz eden, model
 
 ```text
 fatmanurbp/
-├── dashboard.py                        # Streamlit dashboard arayüzü
-├── train_model.py                      # Dashboard için model eğitim scripti
+├── dashboard.py                         # Streamlit dashboard arayüzü
+├── train_model.py                       # Dashboard için model eğitim scripti
 ├── trafik_kaza_riski_tahmini.py          # Detaylı analiz, görselleştirme ve modelleme pipeline'ı
 ├── requirements.txt                     # Python bağımlılıkları
 ├── PROJE_RAPORU.md                      # Ayrıntılı proje analiz raporu
@@ -52,221 +52,213 @@ fatmanurbp/
 ├── kaza_risk_haritasi.html              # Folium interaktif risk haritası
 ├── saatlik_risk_analizi.html            # Plotly saatlik risk analizi
 └── hava_durumu_risk.html                # Plotly hava durumu/risk analizi
-Dashboard Bölümleri
-1. Risk Tahmini
-Kullanıcının girdiği koşullara göre model yüksek risk olasılığı hesaplar. Bu bölümde sıcaklık, nem, basınç, görüş mesafesi, rüzgar hızı, yağış, saat, gün, ay, konum ve yol özellikleri gibi parametreler kullanılır.
+```
+
+## Dashboard Bölümleri
+
+### 1. Risk Tahmini
+
+Kullanıcının girdiği koşullara göre model yüksek risk olasılığı hesaplar. Bu bölümde sıcaklık, nem, basınç, görüş mesafesi, rüzgâr hızı, yağış, saat, gün, ay, konum ve yol özellikleri gibi parametreler kullanılır.
 
 Dashboard şu çıktıları gösterir:
 
-Risk sınıfı: düşük risk veya yüksek risk
+- Risk sınıfı: düşük risk veya yüksek risk
+- Yüksek risk olasılığı
+- Tahmin edilen coğrafi küme
+- Tahmini etkileyebilecek başlıca koşullar
+- Modelin kullandığı nihai girdi tablosu
 
-Yüksek risk olasılığı
+### 2. Veri Analizi
 
-Tahmin edilen coğrafi küme
-
-Tahmini etkileyebilecek başlıca koşullar
-
-Modelin kullandığı nihai girdi tablosu
-
-2. Veri Analizi
-data/US_Accidents_March23.csv dosyasından ilk 100.000 kayıt okunur ve genel veri özeti sunulur.
+`data/US_Accidents_March23.csv` dosyasından ilk 100.000 kayıt okunur ve genel veri özeti sunulur.
 
 Bu bölümde:
 
-İncelenen kayıt sayısı
-
-Ortalama kaza şiddeti
-
-Yüksek risk oranı
-
-Eyalet sayısı
-
-Kaza şiddeti dağılımı
-
-Saatlere göre kaza sayısı
-
-En fazla kaza olan eyaletler
-
-Hava durumuna göre kaza sayısı
-
-Kayıtlı analiz görselleri
+- incelenen kayıt sayısı
+- ortalama kaza şiddeti
+- yüksek risk oranı
+- eyalet sayısı
+- kaza şiddeti dağılımı
+- saatlere göre kaza sayısı
+- en fazla kaza olan eyaletler
+- hava durumuna göre kaza sayısı
+- kayıtlı analiz görselleri
 
 gösterilir.
 
-3. Harita
-kaza_risk_haritasi.html dosyası dashboard içinde gömülü olarak açılır. Bu dosya, Folium/Leaflet tabanlı interaktif bir risk haritasıdır.
+### 3. Harita
+
+`kaza_risk_haritasi.html` dosyası dashboard içinde gömülü olarak açılır. Bu dosya, Folium/Leaflet tabanlı interaktif bir risk haritasıdır.
 
 Harita, yüksek riskli kaza noktalarının yoğunluğunu ve küme merkezlerini incelemek için kullanılır.
 
-4. Model Performansı
+### 4. Model Performansı
+
 Model performansı ve özellik önemi görselleri bu sekmede gösterilir.
 
 Kullanılan dosyalar:
 
-output_plots/09_model_performans.png
-
-output_plots/10_feature_importance.png
+- `output_plots/09_model_performans.png`
+- `output_plots/10_feature_importance.png`
 
 Bu bölüm, modelin geçmiş veri üzerindeki başarı seviyesini ve karar verirken hangi özelliklere daha fazla ağırlık verdiğini anlamak için kullanılır.
 
-5. Senaryo Karşılaştırma
+### 5. Senaryo Karşılaştırma
+
 İki farklı koşul seti yan yana girilir ve model her iki senaryo için risk olasılığı hesaplar.
 
 Bu bölüm şu sorular için kullanışlıdır:
 
-Hangi hava koşulu daha riskli görünüyor?
+- Hangi hava koşulu daha riskli görünüyor?
+- Gece ve gündüz koşulları arasında risk farkı var mı?
+- Kavşak, trafik ışığı veya yaya geçidi gibi yol özellikleri riski nasıl etkiliyor?
 
-Gece ve gündüz koşulları arasında risk farkı var mı?
+### 6. Veri Önizleme
 
-Kavşak, trafik ışığı veya yaya geçidi gibi yol özellikleri riski nasıl etkiliyor?
-
-6. Veri Önizleme
 Veri setinin ilk 1000 kaydı ve sütun bazlı eksik veri oranları gösterilir. Bu bölüm, dashboard'un kullandığı veriyi hızlı kontrol etmek için eklenmiştir.
 
-Kod Akışı
-train_model.py
+## Kod Akışı
+
+### `train_model.py`
+
 Dashboard tarafında kullanılan modeli üretir.
 
 Genel akış:
 
-data/US_Accidents_March23.csv dosyasını okur.
-
-300.000 kayıtlık örneklem alır.
-
-Eksik sayıal verileri medyan ile doldurur.
-
-Eksik kategorik verileri mod ile doldurur.
-
-Zaman özellikleri üretir: Hour, Day_of_Week, Month, Is_Peak_Hour, Is_Night, Is_Weekend.
-
-Kaza süresini Duration_min olarak hesaplar.
-
-Koordinatları ölçekler ve MiniBatchKMeans ile Cluster özelliğini üretir.
-
-Severity >= 3 için Risk_Label hedef değişkenini oluşturur.
-
-SMOTE ile eğitim verisini dengeler.
-
-RandomForestClassifier modelini eğitir.
-
-Modeli, özellik listesini, coğrafi scaler'ı ve KMeans nesnesini models/risk_model.pkl dosyasına kaydeder.
+1. `data/US_Accidents_March23.csv` dosyasını okur.
+2. 300.000 kayıtlık örneklem alır.
+3. Eksik sayısal verileri medyan ile doldurur.
+4. Eksik kategorik verileri mod ile doldurur.
+5. Zaman özellikleri üretir: `Hour`, `Day_of_Week`, `Month`, `Is_Peak_Hour`, `Is_Night`, `Is_Weekend`.
+6. Kaza süresini `Duration_min` olarak hesaplar.
+7. Koordinatları ölçekler ve MiniBatchKMeans ile `Cluster` özelliğini üretir.
+8. `Severity >= 3` için `Risk_Label` hedef değişkenini oluşturur.
+9. SMOTE ile eğitim verisini dengeler.
+10. RandomForestClassifier modelini eğitir.
+11. Modeli, özellik listesini, coğrafi scaler'ı ve KMeans nesnesini `models/risk_model.pkl` dosyasına kaydeder.
 
 Kaydedilen model paketi şu anahtarları içerir:
 
-model
+- `model`
+- `feature_cols`
+- `geo_scaler`
+- `kmeans`
 
-feature_cols
+### `dashboard.py`
 
-geo_scaler
-
-kmeans
-
-dashboard.py
-Streamlit arayüzünü oluşturur ve models/risk_model.pkl model paketini kullanarak tahmin yapar.
+Streamlit arayüzünü oluşturur ve `models/risk_model.pkl` model paketini kullanarak tahmin yapar.
 
 Ana sorumlulukları:
 
-Modeli cache ile yüklemek
+- Modeli cache ile yüklemek
+- Örnek veri setini dashboard için okumak
+- Kullanıcıdan tahmin parametrelerini almak
+- Tahmin girdisini modelin beklediği kolon sıralamasına getirmek
+- Risk olasılığını ve risk sınıfını hesaplamak
+- Analiz grafikleri, harita ve veri önizleme ekranlarını göstermek
 
-Örnek veri setini dashboard için okumak
+### `trafik_kaza_riski_tahmini.py`
 
-Kullanıcıdan tahmin parametrelerini almak
-
-Tahmin girdisini modelin beklediği kolon sıralamasına getirmek
-
-Risk olasılığını ve risk sınıfını hesaplamak
-
-Analiz grafikleri, harita ve veri önizleme ekranlarını göstermek
-
-trafik_kaza_riski_tahmini.py
 Notebook/hücre yapısında yazılmış ana analiz pipeline'ıdır. EDA, kümeleme, model karşılaştırma ve görselleştirme çıktılarını üretir.
 
 Ürettiği başlıca çıktılar:
 
-output_plots/ altındaki PNG analiz grafikleri
-
-kaza_risk_haritasi.html
-
-saatlik_risk_analizi.html
-
-hava_durumu_risk.html
+- `output_plots/` altındaki PNG analiz grafikleri
+- `kaza_risk_haritasi.html`
+- `saatlik_risk_analizi.html`
+- `hava_durumu_risk.html`
 
 Bu dosyada Random Forest ve XGBoost karşılaştırması da bulunur. Dashboard'daki model eğitiminden farklı olarak daha geniş bir analiz ve raporlama amacı taşır.
 
-Dikkat: Bu dosyada veri yolu US_Accidents_March23.csv/US_Accidents_March23.csv olarak tanımlı görünüyor. Mevcut klasör yapısında veri dosyası data/US_Accidents_March23.csv altındadır. Ana analiz scriptini çalıştırmadan önce DATA_PATH değerinin mevcut veri yoluyla uyumlu olduğunu kontrol edin.
+> Dikkat: Bu dosyada veri yolu `US_Accidents_March23.csv/US_Accidents_March23.csv` olarak tanımlı görünüyor. Mevcut klasör yapısında veri dosyası `data/US_Accidents_March23.csv` altındadır. Ana analiz scriptini çalıştırmadan önce `DATA_PATH` değerinin mevcut veri yoluyla uyumlu olduğunu kontrol edin.
 
-Kurulum
+## Kurulum
+
 Python sanal ortamı kullanılması önerilir.
 
-Bash
+```bash
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
+```
+
 Linux/macOS için aktivasyon komutu:
 
-Bash
+```bash
 source .venv/bin/activate
-Çalıştırma
-1. Modeli eğitme
+```
+
+## Çalıştırma
+
+### 1. Modeli eğitme
+
 Model dosyası yoksa veya yeniden eğitmek istenirse:
 
-Bash
+```bash
 python train_model.py
-Bu komut models/risk_model.pkl dosyasını oluşturur.
+```
 
-2. Dashboard'u başlatma
-Bash
+Bu komut `models/risk_model.pkl` dosyasını oluşturur.
+
+### 2. Dashboard'u başlatma
+
+```bash
 streamlit run dashboard.py
+```
+
 Streamlit çalıştıktan sonra terminalde verilen lokal adres tarayıcıda açılarak dashboard kullanılabilir.
 
-3. Analiz çıktılarını yeniden üretme
+### 3. Analiz çıktılarını yeniden üretme
+
 Statik grafikler ve HTML çıktıları yeniden üretilmek istenirse:
 
-Bash
+```bash
 python trafik_kaza_riski_tahmini.py
-Çalıştırmadan önce bu dosyadaki DATA_PATH değerinin data/US_Accidents_March23.csv ile uyumlu olduğunu kontrol edin.
+```
 
-Veri Seti
-Proje, US_Accidents_March23.csv veri setini kullanır. Mevcut dosya data/ klasörü altındadır ve büyük boyutlu olduğu için repoya taşınırken veya paylaşılırken dikkat edilmelidir.
+Çalıştırmadan önce bu dosyadaki `DATA_PATH` değerinin `data/US_Accidents_March23.csv` ile uyumlu olduğunu kontrol edin.
+
+## Veri Seti
+
+Proje, `US_Accidents_March23.csv` veri setini kullanır. Mevcut dosya `data/` klasörü altındadır ve büyük boyutlu olduğu için repoya taşınırken veya paylaşılırken dikkat edilmelidir.
 
 Dashboard tarafında veri önizleme ve analiz için ilk 100.000 kayıt okunur. Model eğitiminde ise performans nedeniyle 300.000 kayıtlık rastgele örneklem kullanılır.
 
-Model Özellikleri
+## Model Özellikleri
+
 Modelde kullanılan başlıca özellik grupları:
 
-Hava durumu: sıcaklık, nem, basınç, görüş mesafesi, rüzgar hızı, yağış
-
-Zaman: saat, gün, ay, pik saat, gece, hafta sonu
-
-Konum: enlem, boylamdan üretilen coğrafi küme
-
-Yol özellikleri: kavşak, trafik ışığı, yaya geçidi, dur tabelası, kasis, istasyon, demiryolu vb.
-
-Kaza bilgisi: etki mesafesi ve süre
+- Hava durumu: sıcaklık, nem, basınç, görüş mesafesi, rüzgâr hızı, yağış
+- Zaman: saat, gün, ay, pik saat, gece, hafta sonu
+- Konum: enlem, boylamdan üretilen coğrafi küme
+- Yol özellikleri: kavşak, trafik ışığı, yaya geçidi, dur tabelası, kasis, istasyon, demiryolu vb.
+- Kaza bilgisi: etki mesafesi ve süre
 
 Hedef değişken:
 
-Plaintext
+```text
 Severity >= 3  -> Yüksek Risk
 Severity <= 2  -> Düşük Risk
-Üretilen Çıktılar
-PNG grafikler
-output_plots/ klasörü içinde EDA, korelasyon, kümeleme, model performansı ve özellik önemi görselleri bulunur.
+```
 
-HTML çıktılar
-kaza_risk_haritasi.html: interaktif risk haritası
+## Üretilen Çıktılar
 
-saatlik_risk_analizi.html: saat bazlı risk analizi
+### PNG grafikler
 
-hava_durumu_risk.html: hava durumu ve risk ilişkisi
+`output_plots/` klasörü içinde EDA, korelasyon, kümeleme, model performansı ve özellik önemi görselleri bulunur.
+
+### HTML çıktılar
+
+- `kaza_risk_haritasi.html`: interaktif risk haritası
+- `saatlik_risk_analizi.html`: saat bazlı risk analizi
+- `hava_durumu_risk.html`: hava durumu ve risk ilişkisi
 
 Bu dosyalar doğrudan tarayıcıda açılabilir veya dashboard içinde gösterilebilir.
 
-Önemli Notlar
-models/risk_model.pkl dosyası olmadan dashboard tahmin sekmesi çalışmaz. Eksikse önce train_model.py çalıştırılmalıdır.
+## Önemli Notlar
 
-Dashboard tahminleri geçmiş veri tabanlı model çıktısıdır; gerçek zamanlı trafik karar sistemi olarak kullanılmamalıdır.
+- `models/risk_model.pkl` dosyası olmadan dashboard tahmin sekmesi çalışmaz. Eksikse önce `train_model.py` çalıştırılmalıdır.
+- Dashboard tahminleri geçmiş veri tabanlı model çıktısıdır; gerçek zamanlı trafik karar sistemi olarak kullanılmamalıdır.
+- Veri seti büyük olduğu için okuma ve model eğitimi zaman alabilir.
+- Ana analiz scripti ile dashboard eğitim scripti benzer özellikler kullansa da birebir aynı amaca hizmet etmez: `trafik_kaza_riski_tahmini.py` analiz ve raporlama, `train_model.py` ise dashboard model paketi üretme odaklıdır.
 
-Veri seti büyük olduğu için okuma ve model eğitimi zaman alabilir.
-
-Ana analiz scripti ile dashboard eğitim scripti benzer özellikler kullansa da birebir aynı amaca hizmet etmez: trafik_kaza_riski_tahmini.py analiz ve raporlama, train_model.py ise dashboard model paketi üretme odaklıdır.
